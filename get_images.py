@@ -24,7 +24,7 @@ def fetch_images(url, save_dir, interval=2):
         time.sleep(interval)
 
 # Change this to your correct save path
-save_directory = r"C:\Users\araj8\Downloads\llm_images"
-camera_url = "http://192.168.2.222/camera"
+# save_directory = r"C:\Users\araj8\Downloads\llm_images"
+# camera_url = "http://192.168.2.222/camera"
 
-fetch_images(camera_url, save_directory)
+# fetch_images(camera_url, save_directory)
