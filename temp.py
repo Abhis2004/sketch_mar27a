@@ -306,32 +306,37 @@ def process_image_and_update_command():
     while True:
         fetch_image()  # Get latest image
 
-        
+        prompt = "Analyze the image and detect any objects in front of the camera. If no objects are found, respond with 'nothing detected'. If an object is present, describe it briefly. Then, based on the obstacle's position, respond with one of the following movement commands: 'move forward', 'turn left', 'turn right', 'stop', or 'move backward'."
+
         # prompt = (
         #     "Analyze the image to avoid objects and move on clear path. Respond with exactly one of the following commands: "
         #     "'move forward', 'turn left', 'turn right', 'stop', or 'move backward'. "
         #     "Describe image in one line. Respond with the command."
         # )
-        prompt = "Analyze the image to avoid objects and move on clear path. Respond with exactly one of the following commands: move forward', 'turn left', 'turn right', 'stop', or 'move backward'. Describe image in one line. Respond with the command."
-        
 
         llava_response = chat_with_llava(prompt, IMAGE_PATH)
         print("LLaVA Response:", llava_response)
 
+        new_command = "stop"  # Default to stop
 
         # Decision mapping based on AI response
-        if "move forward" in llava_response.lower():
+        while True:
+             llava_response = llm.detect_objects()  # Replace with actual object detection function
+             
+             if "nothing" in llava_response.lower() or "no object" in llava_response.lower():
+                 new_command = "forward"
+            else:
+                 new_command = "right"
+        # Move right and check again
+        llava_response = llm.detect_objects()  
+        
+        if "nothing" in llava_response.lower() or "no object" in llava_response.lower():
             new_command = "forward"
-        elif "turn left" in llava_response.lower():
-            new_command = "left"
-        elif "turn right" in llava_response.lower():
-            new_command = "right"
-        elif "stop" in llava_response.lower():
-            #new_command = "stop"
-            #time.sleep(0.5)
-            new_command = "right"  # Try turning right
-        elif "move backward" in llava_response.lower():
-            new_command = "backward"
+        else:
+            new_command = "left"  # If right is also blocked, try left and recheck
+
+    execute_command(new_command)  # Replace with actual function to move the car
+
 
         # Update command safely and send it
         with command_lock:
